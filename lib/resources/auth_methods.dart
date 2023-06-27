@@ -2,7 +2,7 @@ import "dart:typed_data";
 
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
-import "package:flutter/material.dart";
+//import "package:flutter/material.dart";
 import "package:instagram_clone/resources/storage_methods.dart";
 
 class AuthMethods {
@@ -42,6 +42,12 @@ class AuthMethods {
         });
         res = 'success';
       }
+    } on FirebaseAuthException catch (fireError) {
+      if (fireError.code == 'invalid-email') {
+        res = 'Please provide a valid email';
+      } else if (fireError.code == 'weak-password') {
+        res = 'Password should be at least 6 digits';
+      } //TODO: Add verification for when email already exist. Currently is showing line 20
     } catch (error) {
       res = error.toString();
     }

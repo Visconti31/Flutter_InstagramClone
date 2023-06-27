@@ -21,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   Uint8List? _image;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -37,6 +38,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {
       _image = file;
     });
+  }
+
+  void registerUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    String res = await AuthMethods().registerUser(
+      email: _emailController.text,
+      password: _passwordController.text,
+      username: _usernameController.text,
+      bio: _bioController.text,
+      file: _image!,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (res != 'success') {
+      showSnackBar(res, context);
+    }
   }
 
   @override
@@ -119,16 +142,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 48),
                 // Button Register
                 InkWell(
-                  onTap: () async {
-                    String res = await AuthMethods().registerUser(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                      username: _usernameController.text,
-                      bio: _bioController.text,
-                      file: _image!,
-                    );
-                    print(res);
-                  },
+                  onTap: registerUser,
                   child: Container(
                     width: double.infinity,
                     alignment: Alignment.center,
@@ -141,7 +155,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       color: blueColor,
                     ),
-                    child: const Text('Register'),
+                    child: _isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: primaryColor,
+                            ),
+                          )
+                        : const Text('Register'),
                   ),
                 ),
                 const SizedBox(height: 12),
