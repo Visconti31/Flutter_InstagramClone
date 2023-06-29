@@ -30,7 +30,6 @@ class AuthMethods {
             .uploadImageToStorage('profileImages', file, false);
 
         // Add user to database
-        print(userCred.user!.uid);
         await _firestore.collection('users').doc(userCred.user!.uid).set({
           'username': username,
           'uid': userCred.user!.uid,
@@ -51,6 +50,30 @@ class AuthMethods {
     } catch (error) {
       res = error.toString();
     }
+    return res;
+  }
+
+  //Login user
+  Future<String> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    String res = 'Some error occur';
+
+    try {
+      if (email.isNotEmpty || password.isNotEmpty) {
+        await _auth.signInWithEmailAndPassword(
+            email: email, password: password);
+
+        res = 'success';
+      } else {
+        //TODO Add verification for each tipe of error
+        res = 'Enter all the fields';
+      }
+    } catch (error) {
+      res = error.toString();
+    }
+
     return res;
   }
 }
